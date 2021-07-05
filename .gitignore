@@ -1,0 +1,4 @@
+packer_cache/
+build/
+*.log
+*.img

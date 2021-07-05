@@ -1,22 +1,47 @@
+/**
+*
+* # pi-packer
+*
+* An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, based on the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin.
+*
+* ## Usage
+* ```bash
+* docker run --rm --privileged \
+*     -v /dev:/dev \
+*     -v ${PWD}:/build \
+*     mkaczanowski/packer-builder-arm \
+*         build \
+*         -var-file=_example.pkrvars.hcl \
+*         -var="image_path=rpi.img" \
+*         pi.pkr.hcl
+* ```
+*
+*/
+
+
 # Variables: packer-builder-arm builder 'file_'
 # https://github.com/mkaczanowski/packer-builder-arm#remote-file
 
 variable "file_url" {
     type = string
+    description = "The URL of the OS image file. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
 }
 
 variable "file_target_extension" {
     type = string
     default = "zip"
+    description = "The file extension of `file_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
 }
 
 variable "file_checksum_url" {
     type = string
+    description = "The checksum file URL of `file_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
 }
 
 variable "file_checksum_type" {
     type = string
     default = "sha256"
+    description = "The checksum type of `file_checksum_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
 }
 
 # Variables: packer-builder-arm builder 'image_'
@@ -24,6 +49,7 @@ variable "file_checksum_type" {
 
 variable "image_path" {
     type = string
+    description = "The file path the new OS image to create"
 }
 
 # Variables: OS Config
@@ -31,7 +57,7 @@ variable "image_path" {
 variable "locales" {
     type = list(string)
     default = ["en_CA.UTF-8 UTF-8", "en_US.UTF-8 UTF-8"]
-    description = "List of locales to generate, as seen in /etc/locale.gen"
+    description = "List of locales to generate, as seen in `/etc/locale.gen`"
 }
 
 # Variables: /boot configs
@@ -39,13 +65,15 @@ variable "locales" {
 variable "wpa_supplicant_enabled" {
     type = bool
     default = true
+    description = "Create a [`wpa_supplicant.conf` file](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md).<br/>If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`"
 }
 
 variable "wpa_supplicant_path" {
     type = string
+    description = ""
 }
 
-variable "wpa_supplicant__ssid" {
+variable "wpa_supplicant_ssid" {
     type = string
     default = ""
 }
@@ -252,3 +280,16 @@ build {
     #     ]
     # }
 }
+
+/**
+
+To re-gen the README.md:
+(requires terraform-docs -- which only reads .tf,
+and the header from main.tf)
+
+cp pi.pkr.hcl main.tf \
+&& terraform-docs markdown \
+	--show "header,inputs,footer" . > README.md \
+&& rm main.tf
+
+*/

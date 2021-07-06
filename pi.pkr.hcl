@@ -129,11 +129,11 @@ locals {
     wpa_supplicant = <<-EOF
         ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
         update_config=1
-        country=${upper(var.wpa_country)}
+        country=${upper(var.wpa_supplicant_country)}
 
         network={
-            ssid="${var.wpa_ssid}"
-            psk="${var.wpa_pass}"
+            ssid="${var.wpa_supplicant_ssid}"
+            psk="${var.wpa_supplicant_pass}"
         }
     EOF
 
@@ -172,7 +172,7 @@ source "arm" "rpi" {
     }
 
     image_path       = var.image_path
-    image_size       = "2G"
+    image_size       = "1G"
     image_type       = "dos"
     image_chroot_env = ["PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"]
 
@@ -194,42 +194,45 @@ build {
     }
 
     # Generate new /boot/config.txt
+    # NB: the <tabs> for the indented HEREDOC
     provisioner "shell" {
         inline = [
         <<-EOF
-            tee /boot/config.txt <<- CONFIG
-            ${local.boot_config}
-            CONFIG
+			tee /boot/config.txt <<- CONFIG
+				${local.boot_config}
+				CONFIG
         EOF
         ]
     }
 
     # Generate new /boot/cmdline.txt
+    # NB: the <tabs> for the indented HEREDOC
     provisioner "shell" {
         inline = [
         <<-EOF
-            tee /boot/cmdline.txt <<- CONFIG
-            ${local.boot_cmdline}
-            CONFIG
+			tee /boot/cmdline.txt <<- CONFIG
+				${local.boot_cmdline}
+				CONFIG
         EOF
         ]
     }
 
     # Generate /etc/wpa_supplicant/wpa_supplicant.conf (if enabled)
-    # Send to /dev/null to prevent secrets from showing up in log
+    # NB: send to /dev/null to prevent secrets from showing up in log
+    # NB: the <tabs> for the indented HEREDOC
     provisioner "shell" {
         inline = [
         <<-EOF
             %{ if var.wpa_supplicant_enabled }
-                tee /etc/wpa_supplicant/wpa_supplicant.conf <<- CONFIG > /dev/null
-                %{ if fileexists(var.wpa_supplicant_path) }
-                ${file(var.wpa_supplicant_path)}
-                %{ else }
-                ${local.wpa_supplicant}
-                %{ endif }
-                CONFIG
+			tee /boot/wpa_supplicant.conf <<- CONFIG
+				%{~ if fileexists(var.wpa_supplicant_path) ~}
+				${ file(var.wpa_supplicant_path) }
+				%{ else }
+				${ local.wpa_supplicant }
+				%{ endif }
+				CONFIG
             %{ else }
-                echo "wpa_supplicant disabled."
+            echo "wpa_supplicant disabled."
             %{ endif }
         EOF
         ]
@@ -240,9 +243,9 @@ build {
     provisioner "shell" {
         inline = [
         <<-EOF
-            cat <<- CONF >> /etc/locale.gen
-            ${local.localgen}
-            CONF
+			tee -a /etc/locale.gen <<- CONFIG
+				${local.localgen}
+				CONFIG
         EOF
         ]
     }
@@ -289,7 +292,7 @@ and the header from main.tf)
 
 cp pi.pkr.hcl main.tf \
 && terraform-docs markdown \
-	--show "header,inputs,footer" . > README.md \
+	--show "header,inputs" . > README.md \
 && rm main.tf
 
 */

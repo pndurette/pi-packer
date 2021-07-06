@@ -224,7 +224,7 @@ build {
         inline = [
         <<-EOF
             %{ if var.wpa_supplicant_enabled }
-			tee /boot/wpa_supplicant.conf <<- CONFIG
+			tee /boot/wpa_supplicant.conf <<- CONFIG > /dev/null
 				%{~ if fileexists(var.wpa_supplicant_path) ~}
 				${ file(var.wpa_supplicant_path) }
 				%{ else }

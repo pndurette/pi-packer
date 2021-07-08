@@ -27,6 +27,9 @@ packages:
 # Create all the files and stuff to have a USB gadget, from:
 # https://medium.com/sausheong/setting-up-a-raspberry-pi-4-as-an-development-machine-for-your-ipad-pro-3813f872fccc
 
+# TODO:
+# * Fix the order of creation + startup (+ potential reboot)
+
 write_files:
   - path: /root/usb.sh
     owner: root:root

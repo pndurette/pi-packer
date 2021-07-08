@@ -18,6 +18,8 @@
 *
 */
 
+# TODO:
+# * Use defaults instead of a "base" var file
 
 # Variables: packer-builder-arm builder 'file_'
 # https://github.com/mkaczanowski/packer-builder-arm#remote-file

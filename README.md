@@ -1,7 +1,7 @@
 
 # pi-packer
 
-An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, based on the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin.
+An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin.
 
 ## Usage
 ```bash

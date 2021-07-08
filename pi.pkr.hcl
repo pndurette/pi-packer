@@ -11,8 +11,8 @@
 *     -v ${PWD}:/build \
 *     mkaczanowski/packer-builder-arm \
 *         build \
-*         -var-file=_example.pkrvars.hcl \
-*         -var="image_path=rpi.img" \
+*         -var-file=base.pkrvars.hcl \
+*         -var-file=usb_gadget.pkrvars.hcl \
 *         pi.pkr.hcl
 * ```
 *
@@ -70,7 +70,7 @@ variable "wpa_supplicant_enabled" {
 
 variable "wpa_supplicant_path" {
     type = string
-    description = ""
+    default = ""
 }
 
 variable "wpa_supplicant_ssid" {
@@ -101,6 +101,20 @@ variable "boot_config" {
 variable "boot_config_filters" {
     type = map(list(string))
     default = {}
+}
+
+variable "cloudinit_metadata_file" {
+    type = string
+    default = ""
+}
+
+variable "cloudinit_userdata_file" {
+    type = string
+    default = ""
+}
+
+variable "kernel_modules" {
+    type = list(string)
 }
 
 locals {
@@ -139,6 +153,9 @@ locals {
 
     # /etc/locale.gen
     localgen = join("\n", var.locales)
+
+    # /etc/modules
+    kernel_modules = join("\n", var.kernel_modules)
 }
 
 # Packer ARM builder
@@ -251,37 +268,51 @@ build {
     }
 
     # # Install cloud-init
-    # provisioner "shell" {
-    #     inline = [
-    #         "sudo apt-get update",
-    #         "sudo apt-get install -y cloud-init"
-    #     ]
-    # }
+    # TODO: Make multi-distro
+    provisioner "shell" {
+        inline = [
+            "sudo apt-get update",
+            "sudo apt-get install -y cloud-init"
+        ]
+    }
 
-    # # cloud-init cloud.cfg
-    # provisioner "file" {
-    #     source = "config/cloud.cfg.yaml"
-    #     destination = "/etc/cloud/cloud.cfg"
-    # }
+    # cloud-init cloud.cfg
+    # TODO: Make more generic/configurable
+    provisioner "file" {
+        source = "cloud-init/cloud.cfg.yaml"
+        destination = "/etc/cloud/cloud.cfg"
+    }
 
-    # # Copy meta-data and user-data
-    # provisioner "file" {
-    #     source = "config/meta-data.yaml"
-    #     destination = "/boot/meta-data"
-    # }
+    # Copy meta-data and user-data (NoCloud with local paths)
+    # https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html
+    provisioner "file" {
+        source = var.cloudinit_metadata_file
+        destination = "/boot/meta-data"
+    }
 
-    # provisioner "file" {
-    #     source = "config/user-data.yaml"
-    #     destination = "/boot/user-data"
-    # }
+    provisioner "file" {
+        source = var.cloudinit_userdata_file
+        destination = "/boot/user-data"
+    }
 
-    # # Enable services
-    # provisioner "shell" {
-    #     inline = [
-    #         "systemctl enable ssh",
-    #         "systemctl enable cloud-init"
-    #     ]
-    # }
+    # Add kernel modules to load
+    provisioner "shell" {
+        inline = [
+        <<-EOF
+			tee -a /etc/modules <<- CONFIG
+				${local.kernel_modules}
+				CONFIG
+        EOF
+        ]
+    }
+
+    # Enable services
+    provisioner "shell" {
+        inline = [
+            "systemctl enable ssh",
+            "systemctl enable cloud-init"
+        ]
+    }
 }
 
 /**
@@ -295,4 +326,13 @@ cp pi.pkr.hcl main.tf \
 	--show "header,inputs" . > README.md \
 && rm main.tf
 
+# Command:
+docker run --rm --privileged \
+    -v /dev:/dev \
+    -v ${PWD}:/build \
+    mkaczanowski/packer-builder-arm \
+        build \
+        -var-file=base.pkrvars.hcl \
+        -var-file=usb_gadget.pkrvars.hcl \
+        pi.pkr.hcl
 */

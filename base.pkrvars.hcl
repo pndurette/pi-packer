@@ -16,8 +16,8 @@ image_path = "rpi.img"
 # wpa_supplicant.conf file to use
 # https://linux.die.net/man/5/wpa_supplicant.conf
 
-wpa_supplicant_enabled = true
-wpa_supplicant_path = "_conf/home1z.conf"
+wpa_supplicant_enabled = false
+# wpa_supplicant_path = ""
 # wpa_supplicant_ssid = ""
 # wpa_supplicant_pass = ""
 # wpa_supplicant_country = ""
@@ -52,3 +52,13 @@ boot_config_filters = {
         "max_framebuffers=2"
     ]
 }
+
+# Kernel modules to load at boot time
+
+kernel_modules = []
+
+# cloud-init (NoCloud with local paths)
+# https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html
+
+cloudinit_metadata_file = ""
+cloudinit_userdata_file = ""

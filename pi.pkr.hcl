@@ -72,7 +72,7 @@ variable "wpa_supplicant_enabled" {
 
 variable "wpa_supplicant_path" {
     type = string
-    default = ""
+    default = "/tmp/dummy" # fileexists() doesn't like empty strings
 }
 
 variable "wpa_supplicant_ssid" {

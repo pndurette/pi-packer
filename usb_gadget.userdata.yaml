@@ -31,7 +31,7 @@ packages:
 # * Fix the order of creation + startup (+ potential reboot)
 
 write_files:
-  - path: /root/usb.sh
+  - path: /usr/local/sbin/usb-gadget.sh
     owner: root:root
     permissions: '0700'
     content: |
@@ -74,12 +74,6 @@ write_files:
       # start dnsmasq
       service dnsmasq restart
 
-  - path: /etc/rc.local
-    content: |
-      #!/bin/sh -e
-      /root/usb.sh
-      exit 0
-
   - path: /etc/dnsmasq.d/usb
     content: |
       interface=usb0
@@ -99,3 +93,23 @@ write_files:
       iface usb0 inet static
         address 10.55.0.1
         netmask 255.255.255.248
+
+  - path: /etc/systemd/system/usbgadget.service
+    content: |
+      [Unit]
+      Description=USB gadget
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/usr/local/sbin/usb-gadget.sh
+
+      [Install]
+      WantedBy=sysinit.target
+
+runcmd:
+  - systemctl daemon-reload
+  - systemctl enable usbgadget
+  - systemctl start usbgadget

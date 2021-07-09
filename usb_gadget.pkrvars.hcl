@@ -1,6 +1,3 @@
-wpa_supplicant_enabled = true
-wpa_supplicant_path = "conf/home1z.conf"
-
 image_path = "usb_gadget.img"
 
 cloudinit_metadata_file = "usb_gadget.metadata.yaml"

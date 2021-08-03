@@ -156,7 +156,7 @@ variable "boot_config" {
     description = <<-EOT
         [`/boot/config.txt`](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md)
 
-        Raspberri Pi system configuration, as a list. Will be joined by newlines.
+        Raspberry Pi system configuration, as a list. Will be joined by newlines.
 
         e.g.:
         ```
@@ -179,11 +179,11 @@ variable "boot_config_filters" {
     description = <<-EOT
         [`/boot/config.txt`](ttps://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md)
 
-        Raspberri Pi system *conditional filters* configuration, as a map.
+        Raspberry Pi system *conditional filters* configuration, as a map.
 
         e.g.:
         ```
-        boot_config_filters = {}
+        boot_config_filters =
             "[pi0]": [
                 "jhi=123",
                 "klm=456"
@@ -209,7 +209,7 @@ variable "cloudinit_metadata_file" {
     type = string
     description = <<-EOT
         The local path to a cloud-init metadata file.
-        See [cloud-init](https://cloudinit.readthedocs.io/en/latest/index.html) and its [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
+        See the `cloud-init` [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
     EOT
 }
 
@@ -217,7 +217,7 @@ variable "cloudinit_userdata_file" {
     type = string
     description = <<-EOT
         The local path to a cloud-init userdata file.
-        See [cloud-init](https://cloudinit.readthedocs.io/en/latest/index.html) and its [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
+        See the `cloud-init` [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
     EOT
 }
 

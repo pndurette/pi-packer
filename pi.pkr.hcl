@@ -4,7 +4,17 @@
 *
 * An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin.
 *
+* See [`pi.pkr.hcl`](pi.pkr.hcl).
+*
 * ## Usage
+*
+* #### 1. Configuration values
+*
+* Copy [`example.pkrvars.hcl`](example.pkrvars.hcl) and edit
+* *(See [Packer docs](https://www.packer.io/docs/templates/hcl_templates/variables#assigning-values-to-build-variables) for more ways to set input variables)*.
+* 
+* #### 2. Build
+*
 * (e.g. using the [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb_gadget.pkrvars.hcl) [variable override file](https://www.packer.io/docs/templates/hcl_templates/variables#variable-definitions-pkrvars-hcl-and-auto-pkrvars-hcl-files) for the inputs below)
 * ```bash
 * docker run --rm --privileged \
@@ -12,10 +22,10 @@
 *     -v ${PWD}:/build \
 *     mkaczanowski/packer-builder-arm \
 *         build \
-*         -var-file=usb_gadget.pkrvars.hcl \
+*         -var-file=usb-gadget/usb_gadget.pkrvars.hcl \
 *         pi.pkr.hcl
 * ```
-*
+* *(Using the above Docker image and run command is the easiest way build cross-platform ARM images. See [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm#quick-start) for alternative ways to run Packer with the `packer-builder-arm` plugin)*
 */
 
 # Variables: packer-builder-arm builder 'file_'
@@ -23,23 +33,35 @@
 
 variable "file_url" {
     type = string
-    description = "The URL of the OS image file. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    description = <<-EOT
+        The URL of the OS image file.
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)
+    EOT
 }
 
 variable "file_target_extension" {
     type = string
-    description = "The file extension of `file_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    description = <<-EOT
+        The file extension of `file_url`.
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)
+    EOT
     default = "zip"
 }
 
 variable "file_checksum_url" {
     type = string
-    description = "The checksum file URL of `file_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    description = <<-EOT
+        The checksum file URL of `file_url`.
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)
+    EOT
 }
 
 variable "file_checksum_type" {
     type = string
-    description = "The checksum type of `file_checksum_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    description = <<-EOT
+        The checksum type of `file_checksum_url`.
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)
+    EOT
     default = "sha256"
 }
 
@@ -63,7 +85,10 @@ variable "locales" {
 
 variable "wpa_supplicant_enabled" {
     type = bool
-    description = "Create a [`wpa_supplicant.conf` file](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) on the image.<br/>If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`"
+    description = <<-EOT
+        Create a [`wpa_supplicant.conf` file](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) on the image.
+        If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`
+    EOT
     default = true
 }
 
@@ -87,24 +112,29 @@ variable "wpa_supplicant_pass" {
 
 variable "wpa_supplicant_country" {
     type = string
-    description = "The [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in which the device is operating, for `wpa_supplicant`. Necessary for [country-specific radio regulations](https://www.oreilly.com/library/view/learn-robotics-programming/9781789340747/5027f394-f16e-4096-bbaf-05e19070e84e.xhtml)"
+    description = <<-EOT
+        The [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in which the device is operating.
+        Required by the wpa_supplicant.
+    EOT
     default = "CA"
 }
 
 variable "boot_cmdline" {
     type = list(string)
-    description = "[`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) Linux kernel boot parameters, as a list, which will be joined into a space-delimited string"
-    default = [
-        "console=serial0,115200",
-        "console=tty1",
-        "root=PARTUUID=9730496b-02",
-        "rootfstype=ext4",
-        "elevator=deadline",
-        "fsck.repair=yes",
-        "rootwait",
-        "quiet",
-        "init=/usr/lib/raspi-config/init_resize.sh"
-    ]
+    description = <<-EOT
+        [`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) config.
+        
+        Linux kernel boot parameters, as a list, which will be joined as a space-delimited string.
+
+        e.g.:
+        ```hcl
+        boot_cmdline = [
+            "console=serial0,115200",
+            "console=tty1"
+        ]
+        ```
+        Will create `/boot/cmdline.txt` as `onsole=serial0,115200 console=tty1`
+    EOT
 }
 
 variable "boot_config" {
@@ -341,7 +371,7 @@ and the header from main.tf)
 
 cp pi.pkr.hcl main.tf \
 && terraform-docs markdown \
-	--show "header,inputs" . > README.md \
+	--show "header,inputs" --anchor=false . > README.md \
 && rm main.tf
 
 # Command:

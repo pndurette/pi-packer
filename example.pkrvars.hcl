@@ -22,7 +22,7 @@ wpa_supplicant_enabled = false
 # wpa_supplicant_pass = ""
 # wpa_supplicant_country = ""
 
-# /boot/cmdline.txt
+# /boot/cmdline.txt (default)
 # https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md
 
 boot_cmdline = [
@@ -37,13 +37,13 @@ boot_cmdline = [
     "init=/usr/lib/raspi-config/init_resize.sh"
 ]
 
-# /boot/config.txt (properties)
+# /boot/config.txt (properties) (default)
 # http://rpf.io/configtxt
 # https://elinux.org/RPiconfig
 
 boot_config = []
 
-# /boot/config.txt (conditional filters properties)
+# /boot/config.txt (conditional filters properties) (default)
 # https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md
 
 boot_config_filters = {

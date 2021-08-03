@@ -2,7 +2,7 @@
 *
 * # pi-packer
 *
-* An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin.
+* An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin. It leverages [`cloud-init`](https://cloudinit.readthedocs.io/en/latest/index.html) for OS configuration management.
 *
 * See [`pi.pkr.hcl`](pi.pkr.hcl).
 *
@@ -35,7 +35,8 @@ variable "file_url" {
     type = string
     description = <<-EOT
         The URL of the OS image file.
-        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)
+        
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
     EOT
 }
 
@@ -43,7 +44,8 @@ variable "file_target_extension" {
     type = string
     description = <<-EOT
         The file extension of `file_url`.
-        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)
+        
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
     EOT
     default = "zip"
 }
@@ -52,7 +54,8 @@ variable "file_checksum_url" {
     type = string
     description = <<-EOT
         The checksum file URL of `file_url`.
-        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)
+        
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
     EOT
 }
 
@@ -60,7 +63,8 @@ variable "file_checksum_type" {
     type = string
     description = <<-EOT
         The checksum type of `file_checksum_url`.
-        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)
+        
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
     EOT
     default = "sha256"
 }
@@ -70,14 +74,14 @@ variable "file_checksum_type" {
 
 variable "image_path" {
     type = string
-    description = "The file path the new OS image to create"
+    description = "The file path the new OS image to create."
 }
 
 # Variables: OS Config
 
 variable "locales" {
     type = list(string)
-    description = "List of locales to generate, as seen in `/etc/locale.gen`"
+    description = "List of locales to generate, as seen in `/etc/locale.gen`."
     default = ["en_CA.UTF-8 UTF-8", "en_US.UTF-8 UTF-8"]
 }
 
@@ -87,7 +91,8 @@ variable "wpa_supplicant_enabled" {
     type = bool
     description = <<-EOT
         Create a [`wpa_supplicant.conf` file](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) on the image.
-        If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`
+        
+        If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`.
     EOT
     default = true
 }
@@ -100,13 +105,13 @@ variable "wpa_supplicant_path" {
 
 variable "wpa_supplicant_ssid" {
     type = string
-    description = "The WiFi SSID"
+    description = "The WiFi SSID."
     default = ""
 }
 
 variable "wpa_supplicant_pass" {
     type = string
-    description = "The WiFi password"
+    description = "The WiFi password."
     default = ""
 }
 
@@ -114,6 +119,7 @@ variable "wpa_supplicant_country" {
     type = string
     description = <<-EOT
         The [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in which the device is operating.
+        
         Required by the wpa_supplicant.
     EOT
     default = "CA"
@@ -187,7 +193,11 @@ variable "boot_config_filters" {
             "[pi0]": [
                 "jhi=123",
                 "klm=456"
-            ]
+            ],
+            "[pi0w]": [
+                "xzy",
+                "123"
+            ],
         }
         ```
         Will end `/boot/config.txt` with:
@@ -195,6 +205,9 @@ variable "boot_config_filters" {
         [pi0]
         jhi=123
         klm=456
+        [pi0w]
+        xyz
+        123
         ```
     EOT
     default = {
@@ -209,6 +222,7 @@ variable "cloudinit_metadata_file" {
     type = string
     description = <<-EOT
         The local path to a cloud-init metadata file.
+        
         See the `cloud-init` [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
     EOT
 }
@@ -217,6 +231,7 @@ variable "cloudinit_userdata_file" {
     type = string
     description = <<-EOT
         The local path to a cloud-init userdata file.
+        
         See the `cloud-init` [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
     EOT
 }

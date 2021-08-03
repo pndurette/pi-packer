@@ -31,8 +31,8 @@ variable "file_url" {
 
 variable "file_target_extension" {
     type = string
-    default = "zip"
     description = "The file extension of `file_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    default = "zip"
 }
 
 variable "file_checksum_url" {
@@ -42,8 +42,8 @@ variable "file_checksum_url" {
 
 variable "file_checksum_type" {
     type = string
-    default = "sha256"
     description = "The checksum type of `file_checksum_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    default = "sha256"
 }
 
 # Variables: packer-builder-arm builder 'image_'
@@ -58,65 +58,84 @@ variable "image_path" {
 
 variable "locales" {
     type = list(string)
-    default = ["en_CA.UTF-8 UTF-8", "en_US.UTF-8 UTF-8"]
     description = "List of locales to generate, as seen in `/etc/locale.gen`"
+    default = ["en_CA.UTF-8 UTF-8", "en_US.UTF-8 UTF-8"]
 }
 
 # Variables: /boot configs
 
 variable "wpa_supplicant_enabled" {
     type = bool
+    description = "Create a [`wpa_supplicant.conf` file](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) on the image.<br/>If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`"
     default = true
-    description = "Create a [`wpa_supplicant.conf` file](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md).<br/>If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`"
 }
 
 variable "wpa_supplicant_path" {
     type = string
+    description = "The local path to existing `wpa_supplicant.conf` to copy to the image."
     default = "/tmp/dummy" # fileexists() doesn't like empty strings
 }
 
 variable "wpa_supplicant_ssid" {
     type = string
+    description = "The WiFi SSID"
     default = ""
 }
 
 variable "wpa_supplicant_pass" {
     type = string
+    description = "The WiFi password"
     default = ""
 }
 
 variable "wpa_supplicant_country" {
     type = string
+    description = "The [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in which the device is operating, for `wpa_supplicant`. Necessary for [country-specific radio regulations](https://www.oreilly.com/library/view/learn-robotics-programming/9781789340747/5027f394-f16e-4096-bbaf-05e19070e84e.xhtml)."
     default = "CA"
 }
 
 variable "boot_cmdline" {
     type = list(string)
-    default = []
+    description = "[`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) Linux kernel boot parameters, as a list, which will be joined into a space-delimited string"
+    default = [
+        "console=serial0,115200",
+        "console=tty1",
+        "root=PARTUUID=9730496b-02",
+        "rootfstype=ext4",
+        "elevator=deadline",
+        "fsck.repair=yes",
+        "rootwait",
+        "quiet",
+        "init=/usr/lib/raspi-config/init_resize.sh"
+    ]
 }
 
 variable "boot_config" {
     type = list(string)
+    description = "[`/boot/config.txt` Raspberry Pi configs](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md) as a list."
     default = []
 }
 
 variable "boot_config_filters" {
     type = map(list(string))
+    description = "[`/boot/config.txt` Raspberry Pi *conditional filters* configs](https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md), as a map of the type `<filter>: [<configs list>]`.<br/>e.g. `{\"[pi0]\": [\"item1\", \"item2\"]}` will yield:<br/>`[pi0]`<br/>`item1`<br/>`item2`"
     default = {}
 }
 
 variable "cloudinit_metadata_file" {
     type = string
-    default = ""
+    description = "The local path to a cloud-init metadata file"
 }
 
 variable "cloudinit_userdata_file" {
     type = string
-    default = ""
+    description = "The local path to a cloud-init userdata file"
 }
 
 variable "kernel_modules" {
     type = list(string)
+    description = "List of Linux kernel modules to enable, as seen in `/etc/modules`"
+    default = []
 }
 
 locals {

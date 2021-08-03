@@ -25,7 +25,7 @@
 *         -var-file=usb-gadget/usb_gadget.pkrvars.hcl \
 *         pi.pkr.hcl
 * ```
-* *(Using the above Docker image and run command is the easiest way build cross-platform ARM images. See [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm#quick-start) for alternative ways to run Packer with the `packer-builder-arm` plugin)*
+* *(Using the above Docker image and run command is the easiest way to build cross-platform ARM images. See [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm#quick-start) for alternative ways to run Packer with the `packer-builder-arm` plugin)*
 */
 
 # Variables: packer-builder-arm builder 'file_'
@@ -434,8 +434,8 @@ To re-gen the README.md:
 and the header from main.tf)
 
 cp pi.pkr.hcl main.tf \
-&& terraform-docs markdown document \
-	--show "header,inputs" --anchor=false . > README.md \
+&& terraform-docs markdown \
+	--show "header,inputs" . > README.md \
 && rm main.tf
 
 # Command:

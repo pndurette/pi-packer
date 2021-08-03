@@ -30,7 +30,7 @@ docker run --rm --privileged \
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| boot\_cmdline | [`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) config.<br>    <br>Linux kernel boot parameters, as a list, which will be joined as a space-delimited string.<br><br>e.g.:<pre>boot_cmdline = [<br>    "console=serial0",<br>    "console=tty1"<br>]</pre>Will create `/boot/cmdline.txt` as<pre>console=serial0 console=tty1</pre> | `list(string)` | n/a | yes |
+| boot\_cmdline | [`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) config.<br>    <br>Linux kernel boot parameters, as a list, which will be joined as a space-delimited string.<br><br>e.g.:<pre>boot_cmdline = [<br>    "abc",<br>    "def"<br>]</pre>Will create `/boot/cmdline.txt` as<pre>abc def</pre> | `list(string)` | n/a | yes |
 | boot\_config | [`/boot/config.txt` Raspberry Pi configs](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md) as a list. | `list(string)` | `[]` | no |
 | boot\_config\_filters | [`/boot/config.txt` Raspberry Pi *conditional filters* configs](https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md), as a map of the type `<filter>: [<configs list>]`.<br/><br/>e.g. `{"[pi0]": ["item1", "item2"]}` will yield:<br/>`[pi0]`<br/>`item1`<br/>`item2` | `map(list(string))` | `{}` | no |
 | cloudinit\_metadata\_file | The local path to a cloud-init metadata file | `string` | n/a | yes |

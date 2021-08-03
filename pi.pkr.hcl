@@ -373,7 +373,7 @@ To re-gen the README.md:
 and the header from main.tf)
 
 cp pi.pkr.hcl main.tf \
-&& terraform-docs markdown \
+&& terraform-docs markdown document \
 	--show "header,inputs" --anchor=false . > README.md \
 && rm main.tf
 

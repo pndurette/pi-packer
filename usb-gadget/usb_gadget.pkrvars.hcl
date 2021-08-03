@@ -1,7 +1,7 @@
 image_path = "usb_gadget.img"
 
-cloudinit_metadata_file = "usb_gadget.metadata.yaml"
-cloudinit_userdata_file = "usb_gadget.userdata.yaml"
+cloudinit_metadata_file = "usb-gadget/usb_gadget.metadata.yaml"
+cloudinit_userdata_file = "usb-gadget/usb_gadget.userdata.yaml"
 
 # Based on https://medium.com/sausheong/setting-up-a-raspberry-pi-4-as-an-development-machine-for-your-ipad-pro-3813f872fccc
 

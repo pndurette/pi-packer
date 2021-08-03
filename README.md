@@ -4,13 +4,13 @@
 An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin.
 
 ## Usage
+(e.g. using the [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb\_gadget.pkrvars.hcl) [variable override file](https://www.packer.io/docs/templates/hcl_templates/variables#variable-definitions-pkrvars-hcl-and-auto-pkrvars-hcl-files) for the inputs below)
 ```bash
 docker run --rm --privileged \
     -v /dev:/dev \
     -v ${PWD}:/build \
     mkaczanowski/packer-builder-arm \
         build \
-        -var-file=base.pkrvars.hcl \
         -var-file=usb_gadget.pkrvars.hcl \
         pi.pkr.hcl
 ```

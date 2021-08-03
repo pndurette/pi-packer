@@ -1,0 +1,115 @@
+#cloud-config
+timezone: America/Toronto
+locale: en_CA.UTF-8
+
+ntp:
+  enabled: true
+
+users:
+  - default
+
+apt:
+  # keep existing sources (cloud-init wipes them by default)
+  preserve_sources_list: true
+
+# add each entry to ~/.ssh/authorized_keys for the configured user or the
+# first user defined in the user definition directive.
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJ5HlTMLWfPBnv9dC0LBqzFtk0r2OBu9UfHdsbMR5YExSQHnhCI5yNrCDbhxDa/Xd/2x3LYYtcI+VW5Li7inO71wNxrMys9/obAVOXXVgPzOLX/5uG2HNlY1mN9qqhjToZSVTFhJBB3gMLDbuIkI81JrKGWAFFj6nakVdhVXHV3V5hclgQhlFLDmUhmINw9Tk9UkdCn9cWbOIaJmaVtJhDk2rxoqlz/SEaUKzN6RctgmrSggpVNEkAWAWvzoo1b6rkLv14QR2uu02FPpGx0dnicAP/VZGwiTDA0P/XVCa088m4v7MNODG3iWLr8oo4o0Syj5pHaYI60ji/wt2V1ogQGQrkJot/3TWc81z1Pz5YAKhOgnql2WBCJCWGAr81q+pJpMOitCaa5mP8uFHmUsVpYTI3clhy81shmgWyVEgsnLpARKK1rXzIhtYeoHlK60UlP1zwN+caAvE5LJFvJYyQsu73TNhBCyW8MHeOpwiofBF42tCgC4gF/PsNEspc+9sKYiVfIfFdFbgLRsvk7GZS4IDUcOqA8Z68uhECi5Qxemzf6cQerK9jrpZalq57JG/kuXHZfvg65xUbQv5MuI0OdvzuRphK04C1RU+C5VW3hQQmUwdzQ912KNwvY+TTsTzTEjgPU1i8RkF6Jd2fCC6ZeAoYKwfSffFh0MmPCiq+Tw== pndurette@gmail.com
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwyBHk57lrJakcfrfgMLJBFeJr28q45pFPtOdtGMiDIdlTRVwq3Lb//eH//uCIZibp4jFiiPg5/cux+stYMAsEDBcrPpDwhNQHHEmQVULzrfMmgsYRF6ywqc6a5gIIQU+k3AGQowLbEyoXvPyywvA/R+u9L8H25dPAfemH2+7D5bVB4fbw+p+yFVKDeWaZt4lQLxosMD3wL4jtC0Gbbw7qcga4E/2pD6yY7htSuIMj52XhV9AxYnFIveBTgrfsOE0vFTM1EfNaa9drZiYV77HKYnugmDP9gNDX+Z1/7Lu3bY13I6PLHP3Y/AGXhg4nh0MmM35Sz9qIK9smXkTMO4Vh pndurette@Pierres-Air
+
+# package_upgrade: true
+packages:
+  - htop
+  - vim
+  - dnsmasq
+
+# Create all the files and stuff to have a USB gadget, from:
+# https://medium.com/sausheong/setting-up-a-raspberry-pi-4-as-an-development-machine-for-your-ipad-pro-3813f872fccc
+
+# TODO:
+# * Fix the order of creation + startup (+ potential reboot)
+
+write_files:
+  - path: /usr/local/sbin/usb-gadget.sh
+    owner: root:root
+    permissions: '0700'
+    content: |
+      #!/bin/bash
+
+      # create a directory to represent the gadget
+      cd /sys/kernel/config/usb_gadget/ # must be in this dir
+      mkdir -p pi4
+      cd pi4
+      
+      # the USB vendor and product IDs are issued by the USB-IF
+      # each USB gadget must be identified by a vendor and
+      # product ID
+      echo 0x1d6b > idVendor # Linux Foundation
+      echo 0x0104 > idProduct # Multifunction Composite Gadget
+      mkdir -p strings/0x409 # set it up as English
+      
+      # The configuration below is arbitrary
+      echo "1234567890abcdef" > strings/0x409/serialnumber
+      echo "Pierre-Nick Durette" > strings/0x409/manufacturer
+      echo "PierreNickPi" > strings/0x409/product
+      
+      # create a configuration
+      mkdir -p configs/c.1
+      
+      # create a function
+      # ECM is the function name, and usb0 is arbitrary string
+      # that represents the instance name
+      mkdir -p functions/ecm.usb0 
+      
+      # associate function to configuration
+      ln -s functions/ecm.usb0 configs/c.1/ 
+      
+      # bind the gadget to UDC
+      ls /sys/class/udc > UDC 
+      
+      # start up usb0
+      ifup usb0 
+      
+      # start dnsmasq
+      service dnsmasq restart
+
+  - path: /etc/dnsmasq.d/usb
+    content: |
+      interface=usb0
+      dhcp-range=10.55.0.2,10.55.0.6,255.255.255.248,1h
+      dhcp-option=3
+      leasefile-ro
+
+  - path: /etc/dhcpcd.conf
+    append: true
+    content: |
+      denyinterfaces usb0
+
+  - path: /etc/network/interfaces.d/usb0
+    content: |
+      auto usb0
+      allow-hotplug usb0
+      iface usb0 inet static
+        address 10.55.0.1
+        netmask 255.255.255.248
+
+  - path: /etc/systemd/system/usbgadget.service
+    content: |
+      [Unit]
+      Description=USB gadget
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/usr/local/sbin/usb-gadget.sh
+
+      [Install]
+      WantedBy=sysinit.target
+
+runcmd:
+  - systemctl daemon-reload
+  - systemctl enable usbgadget
+  - systemctl start usbgadget

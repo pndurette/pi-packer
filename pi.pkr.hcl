@@ -127,13 +127,16 @@ variable "boot_cmdline" {
         Linux kernel boot parameters, as a list, which will be joined as a space-delimited string.
 
         e.g.:
-        ```hcl
+        ```
         boot_cmdline = [
             "console=serial0,115200",
             "console=tty1"
         ]
         ```
-        Will create `/boot/cmdline.txt` as `onsole=serial0,115200 console=tty1`
+        Will create `/boot/cmdline.txt` as
+        ```
+        console=serial0,115200 console=tty1
+        ```
     EOT
 }
 

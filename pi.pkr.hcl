@@ -129,13 +129,13 @@ variable "boot_cmdline" {
         e.g.:
         ```
         boot_cmdline = [
-            "console=serial0,115200",
+            "console=serial0",
             "console=tty1"
         ]
         ```
         Will create `/boot/cmdline.txt` as
         ```
-        console=serial0,115200 console=tty1
+        console=serial0 console=tty1
         ```
     EOT
 }

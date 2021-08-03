@@ -18,9 +18,6 @@
 *
 */
 
-# TODO:
-# * Use defaults instead of a "base" var file
-
 # Variables: packer-builder-arm builder 'file_'
 # https://github.com/mkaczanowski/packer-builder-arm#remote-file
 
@@ -90,7 +87,7 @@ variable "wpa_supplicant_pass" {
 
 variable "wpa_supplicant_country" {
     type = string
-    description = "The [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in which the device is operating, for `wpa_supplicant`. Necessary for [country-specific radio regulations](https://www.oreilly.com/library/view/learn-robotics-programming/9781789340747/5027f394-f16e-4096-bbaf-05e19070e84e.xhtml)."
+    description = "The [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in which the device is operating, for `wpa_supplicant`. Necessary for [country-specific radio regulations](https://www.oreilly.com/library/view/learn-robotics-programming/9781789340747/5027f394-f16e-4096-bbaf-05e19070e84e.xhtml)"
     default = "CA"
 }
 
@@ -118,7 +115,7 @@ variable "boot_config" {
 
 variable "boot_config_filters" {
     type = map(list(string))
-    description = "[`/boot/config.txt` Raspberry Pi *conditional filters* configs](https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md), as a map of the type `<filter>: [<configs list>]`.<br/>e.g. `{\"[pi0]\": [\"item1\", \"item2\"]}` will yield:<br/>`[pi0]`<br/>`item1`<br/>`item2`"
+    description = "[`/boot/config.txt` Raspberry Pi *conditional filters* configs](https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md), as a map of the type `<filter>: [<configs list>]`.<br/><br/>e.g. `{\"[pi0]\": [\"item1\", \"item2\"]}` will yield:<br/>`[pi0]`<br/>`item1`<br/>`item2`"
     default = {}
 }
 

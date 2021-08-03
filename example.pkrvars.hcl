@@ -9,7 +9,7 @@ file_checksum_type = "sha256"
 
 # Resulting image file
 # Could also be passed at the command line, e.g.
-# -var="image_path=rpi.img"
+# -var="image_path=whatever.img"
 
 image_path = "rpi.img"
 

@@ -124,7 +124,7 @@ variable "boot_cmdline" {
     description = <<-EOT
         [`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) config.
         
-        Linux kernel boot parameters, as a list, which will be joined as a space-delimited string.
+        Linux kernel boot parameters, as a list. Will be joined as a space-delimited string.
 
         e.g.:
         ```
@@ -138,28 +138,87 @@ variable "boot_cmdline" {
         abc def
         ```
     EOT
+    default = [
+        "console=serial0,115200",
+        "console=tty1",
+        "root=PARTUUID=9730496b-02",
+        "rootfstype=ext4",
+        "elevator=deadline",
+        "fsck.repair=yes",
+        "rootwait",
+        "quiet",
+        "init=/usr/lib/raspi-config/init_resize.sh"
+    ]
 }
 
 variable "boot_config" {
     type = list(string)
-    description = "[`/boot/config.txt` Raspberry Pi configs](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md) as a list."
+    description = <<-EOT
+        [`/boot/config.txt`](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md)
+
+        Raspberri Pi system configuration, as a list. Will be joined by newlines.
+
+        e.g.:
+        ```
+        boot_cmdline = [
+            "abc=123",
+            "def=456"
+        ]
+        ```
+        Will begin `/boot/config.txt` with:
+        ```
+        abc=123
+        def=456
+        ```
+    EOT
     default = []
 }
 
 variable "boot_config_filters" {
     type = map(list(string))
-    description = "[`/boot/config.txt` Raspberry Pi *conditional filters* configs](https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md), as a map of the type `<filter>: [<configs list>]`.<br/><br/>e.g. `{\"[pi0]\": [\"item1\", \"item2\"]}` will yield:<br/>`[pi0]`<br/>`item1`<br/>`item2`"
-    default = {}
+    description = <<-EOT
+        [`/boot/config.txt`](ttps://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md)
+
+        Raspberri Pi system *conditional filters* configuration, as a map.
+
+        e.g.:
+        ```
+        boot_config_filters = {}
+            "[pi0]": [
+                "jhi=123",
+                "klm=456"
+            ]
+        }
+        ```
+        Will end `/boot/config.txt` with:
+        ```
+        [pi0]
+        jhi=123
+        klm=456
+        ```
+    EOT
+    default = {
+        "[pi4]": [
+            "dtoverlay=vc4-fkms-v3d",
+            "max_framebuffers=2"
+        ]
+    }
 }
 
 variable "cloudinit_metadata_file" {
     type = string
-    description = "The local path to a cloud-init metadata file"
+    description = <<-EOT
+        The local path to a cloud-init metadata file.
+        See [cloud-init](https://cloudinit.readthedocs.io/en/latest/index.html) and its [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
+    EOT
 }
 
 variable "cloudinit_userdata_file" {
     type = string
-    description = "The local path to a cloud-init userdata file"
+    description = <<-EOT
+        The local path to a cloud-init userdata file.
+        See [cloud-init](https://cloudinit.readthedocs.io/en/latest/index.html) and its [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
+    EOT
 }
 
 variable "kernel_modules" {
@@ -167,6 +226,8 @@ variable "kernel_modules" {
     description = "List of Linux kernel modules to enable, as seen in `/etc/modules`"
     default = []
 }
+
+# File content is all generated within locals
 
 locals {
     # Generate files string content

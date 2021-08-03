@@ -30,35 +30,17 @@ docker run --rm --privileged \
 
 The following input variables are required:
 
-### boot\_cmdline
-
-Description: [`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) config.  
-      
-Linux kernel boot parameters, as a list, which will be joined as a space-delimited string.
-
-e.g.:
-```
-boot_cmdline = [
-    "abc",
-    "def"
-]
-```  
-Will create `/boot/cmdline.txt` as
-```
-abc def
-```
-
-Type: `list(string)`
-
 ### cloudinit\_metadata\_file
 
-Description: The local path to a cloud-init metadata file
+Description: The local path to a cloud-init metadata file.  
+See [cloud-init](https://cloudinit.readthedocs.io/en/latest/index.html) and its [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
 
 Type: `string`
 
 ### cloudinit\_userdata\_file
 
-Description: The local path to a cloud-init userdata file
+Description: The local path to a cloud-init userdata file.  
+See [cloud-init](https://cloudinit.readthedocs.io/en/latest/index.html) and its [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
 
 Type: `string`
 
@@ -86,9 +68,60 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
+### boot\_cmdline
+
+Description: [`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) config.  
+      
+Linux kernel boot parameters, as a list. Will be joined as a space-delimited string.
+
+e.g.:
+```
+boot_cmdline = [
+    "abc",
+    "def"
+]
+```  
+Will create `/boot/cmdline.txt` as
+```
+abc def
+```
+
+Type: `list(string)`
+
+Default:
+
+```json
+[
+  "console=serial0,115200",
+  "console=tty1",
+  "root=PARTUUID=9730496b-02",
+  "rootfstype=ext4",
+  "elevator=deadline",
+  "fsck.repair=yes",
+  "rootwait",
+  "quiet",
+  "init=/usr/lib/raspi-config/init_resize.sh"
+]
+```
+
 ### boot\_config
 
-Description: [`/boot/config.txt` Raspberry Pi configs](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md) as a list.
+Description: [`/boot/config.txt`](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md)
+
+Raspberri Pi system configuration, as a list. Will be joined by newlines.
+
+e.g.:
+```
+boot_cmdline = [
+    "abc=123",
+    "def=456"
+]
+```  
+Will begin `/boot/config.txt` with:
+```
+abc=123
+def=456
+```
 
 Type: `list(string)`
 
@@ -96,11 +129,38 @@ Default: `[]`
 
 ### boot\_config\_filters
 
-Description: [`/boot/config.txt` Raspberry Pi *conditional filters* configs](https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md), as a map of the type `<filter>: [<configs list>]`.<br/><br/>e.g. `{"[pi0]": ["item1", "item2"]}` will yield:<br/>`[pi0]`<br/>`item1`<br/>`item2`
+Description: [`/boot/config.txt`](ttps://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md)
+
+Raspberri Pi system *conditional filters* configuration, as a map.
+
+e.g.:
+```
+boot_config_filters = {}
+    "[pi0]": [
+        "jhi=123",
+        "klm=456"
+    ]
+}
+```  
+Will end `/boot/config.txt` with:
+```
+[pi0]
+jhi=123
+klm=456
+```
 
 Type: `map(list(string))`
 
-Default: `{}`
+Default:
+
+```json
+{
+  "[pi4]": [
+    "dtoverlay=vc4-fkms-v3d",
+    "max_framebuffers=2"
+  ]
+}
+```
 
 ### file\_checksum\_type
 

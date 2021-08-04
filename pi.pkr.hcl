@@ -2,20 +2,31 @@
 *
 * # pi-packer
 *
-* An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin.
+* An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin. It implements [cloud-init](https://cloudinit.readthedocs.io/en/latest/index.html) for last-mile OS configuration and management.
+*
+* See [`pi.pkr.hcl`](pi.pkr.hcl).
 *
 * ## Usage
-* (e.g. using the [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb_gadget.pkrvars.hcl) [variable override file](https://www.packer.io/docs/templates/hcl_templates/variables#variable-definitions-pkrvars-hcl-and-auto-pkrvars-hcl-files) for the inputs below)
+*
+* ### 1. Configuration values
+*
+* Copy [`example.pkrvars.hcl`](example.pkrvars.hcl) and edit.
+* 
+* *(See [Packer docs](https://www.packer.io/docs/templates/hcl_templates/variables#assigning-values-to-build-variables) for more ways to set input variables)*
+* 
+* ### 2. Build
+*
+* (e.g. using [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb_gadget.pkrvars.hcl))
 * ```bash
 * docker run --rm --privileged \
 *     -v /dev:/dev \
 *     -v ${PWD}:/build \
 *     mkaczanowski/packer-builder-arm \
 *         build \
-*         -var-file=usb_gadget.pkrvars.hcl \
+*         -var-file=usb-gadget/usb_gadget.pkrvars.hcl \
 *         pi.pkr.hcl
 * ```
-*
+* *(Using the above Docker image and run command is the easiest way to build cross-platform ARM images. See [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm#quick-start) for alternative ways to run Packer with the `packer-builder-arm` plugin)*
 */
 
 # Variables: packer-builder-arm builder 'file_'
@@ -23,23 +34,39 @@
 
 variable "file_url" {
     type = string
-    description = "The URL of the OS image file. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    description = <<-EOT
+        The URL of the OS image file.
+        
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
+    EOT
 }
 
 variable "file_target_extension" {
     type = string
-    description = "The file extension of `file_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    description = <<-EOT
+        The file extension of `file_url`.
+        
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
+    EOT
     default = "zip"
 }
 
 variable "file_checksum_url" {
     type = string
-    description = "The checksum file URL of `file_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    description = <<-EOT
+        The checksum file URL of `file_url`.
+        
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
+    EOT
 }
 
 variable "file_checksum_type" {
     type = string
-    description = "The checksum type of `file_checksum_url`. See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file)"
+    description = <<-EOT
+        The checksum type of `file_checksum_url`.
+        
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
+    EOT
     default = "sha256"
 }
 
@@ -48,14 +75,14 @@ variable "file_checksum_type" {
 
 variable "image_path" {
     type = string
-    description = "The file path the new OS image to create"
+    description = "The file path the new OS image to create."
 }
 
 # Variables: OS Config
 
 variable "locales" {
     type = list(string)
-    description = "List of locales to generate, as seen in `/etc/locale.gen`"
+    description = "List of locales to generate, as seen in `/etc/locale.gen`."
     default = ["en_CA.UTF-8 UTF-8", "en_US.UTF-8 UTF-8"]
 }
 
@@ -63,7 +90,11 @@ variable "locales" {
 
 variable "wpa_supplicant_enabled" {
     type = bool
-    description = "Create a [`wpa_supplicant.conf` file](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) on the image.<br/>If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`"
+    description = <<-EOT
+        Create a [`wpa_supplicant.conf` file](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) on the image.
+        
+        If `wpa_supplicant_path` exists, it will be copied to the OS image, otherwise a basic `wpa_supplicant.conf` file will be created using `wpa_supplicant_ssid`, `wpa_supplicant_pass` and `wpa_supplicant_country`.
+    EOT
     default = true
 }
 
@@ -75,25 +106,45 @@ variable "wpa_supplicant_path" {
 
 variable "wpa_supplicant_ssid" {
     type = string
-    description = "The WiFi SSID"
+    description = "The WiFi SSID."
     default = ""
 }
 
 variable "wpa_supplicant_pass" {
     type = string
-    description = "The WiFi password"
+    description = "The WiFi password."
     default = ""
 }
 
 variable "wpa_supplicant_country" {
     type = string
-    description = "The [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in which the device is operating, for `wpa_supplicant`. Necessary for [country-specific radio regulations](https://www.oreilly.com/library/view/learn-robotics-programming/9781789340747/5027f394-f16e-4096-bbaf-05e19070e84e.xhtml)"
+    description = <<-EOT
+        The [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country code in which the device is operating.
+        
+        Required by the wpa_supplicant.
+    EOT
     default = "CA"
 }
 
 variable "boot_cmdline" {
     type = list(string)
-    description = "[`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) Linux kernel boot parameters, as a list, which will be joined into a space-delimited string"
+    description = <<-EOT
+        [`/boot/cmdline.txt`](https://www.raspberrypi.org/documentation/configuration/cmdline-txt.md) config.
+        
+        Linux kernel boot parameters, as a list. Will be joined as a space-delimited string.
+
+        e.g.:
+        ```
+        boot_cmdline = [
+            "abc",
+            "def"
+        ]
+        ```
+        Will create `/boot/cmdline.txt` as
+        ```
+        abc def
+        ```
+    EOT
     default = [
         "console=serial0,115200",
         "console=tty1",
@@ -109,24 +160,81 @@ variable "boot_cmdline" {
 
 variable "boot_config" {
     type = list(string)
-    description = "[`/boot/config.txt` Raspberry Pi configs](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md) as a list."
+    description = <<-EOT
+        [`/boot/config.txt`](https://www.raspberrypi.org/documentation/configuration/config-txt/README.md)
+
+        Raspberry Pi system configuration, as a list. Will be joined by newlines.
+
+        e.g.:
+        ```
+        boot_cmdline = [
+            "abc=123",
+            "def=456"
+        ]
+        ```
+        Will begin `/boot/config.txt` with:
+        ```
+        abc=123
+        def=456
+        ```
+    EOT
     default = []
 }
 
 variable "boot_config_filters" {
     type = map(list(string))
-    description = "[`/boot/config.txt` Raspberry Pi *conditional filters* configs](https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md), as a map of the type `<filter>: [<configs list>]`.<br/><br/>e.g. `{\"[pi0]\": [\"item1\", \"item2\"]}` will yield:<br/>`[pi0]`<br/>`item1`<br/>`item2`"
-    default = {}
+    description = <<-EOT
+        [`/boot/config.txt`](ttps://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md)
+
+        Raspberry Pi system *conditional filters* configuration, as a map.
+
+        e.g.:
+        ```
+        boot_config_filters =
+            "[pi0]": [
+                "jhi=123",
+                "klm=456"
+            ],
+            "[pi0w]": [
+                "xzy",
+                "123"
+            ],
+        }
+        ```
+        Will end `/boot/config.txt` with:
+        ```
+        [pi0]
+        jhi=123
+        klm=456
+        [pi0w]
+        xyz
+        123
+        ```
+    EOT
+    default = {
+        "[pi4]": [
+            "dtoverlay=vc4-fkms-v3d",
+            "max_framebuffers=2"
+        ]
+    }
 }
 
 variable "cloudinit_metadata_file" {
     type = string
-    description = "The local path to a cloud-init metadata file"
+    description = <<-EOT
+        The local path to a cloud-init metadata file.
+        
+        See the `cloud-init` [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
+    EOT
 }
 
 variable "cloudinit_userdata_file" {
     type = string
-    description = "The local path to a cloud-init userdata file"
+    description = <<-EOT
+        The local path to a cloud-init userdata file.
+        
+        See the `cloud-init` [`NoCloud` datasource](https://cloudinit.readthedocs.io/en/latest/topics/datasources/nocloud.html)
+    EOT
 }
 
 variable "kernel_modules" {
@@ -134,6 +242,8 @@ variable "kernel_modules" {
     description = "List of Linux kernel modules to enable, as seen in `/etc/modules`"
     default = []
 }
+
+# File content is all generated within locals
 
 locals {
     # Generate files string content
@@ -296,6 +406,7 @@ build {
 
     # cloud-init cloud.cfg
     # TODO: Make more generic/configurable
+    # TODO: Use /etc/cloud/cloud.cfg.d/*.cfg
     provisioner "file" {
         source = "cloud-init/cloud.cfg.yaml"
         destination = "/etc/cloud/cloud.cfg"

@@ -8,13 +8,13 @@
 *
 * ## Usage
 *
-* #### 1. Configuration values
+* ### 1. Configuration values
 *
 * Copy [`example.pkrvars.hcl`](example.pkrvars.hcl) and edit.
 * 
 * *(See [Packer docs](https://www.packer.io/docs/templates/hcl_templates/variables#assigning-values-to-build-variables) for more ways to set input variables)*.
 * 
-* #### 2. Build
+* ### 2. Build
 *
 * (e.g. using the [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb_gadget.pkrvars.hcl) [variable override file](https://www.packer.io/docs/templates/hcl_templates/variables#variable-definitions-pkrvars-hcl-and-auto-pkrvars-hcl-files) for the inputs below)
 * ```bash

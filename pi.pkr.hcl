@@ -2,7 +2,7 @@
 *
 * # pi-packer
 *
-* An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin. It uses [`cloud-init`](https://cloudinit.readthedocs.io/en/latest/index.html) for last-mile OS configuration and management.
+* An opinionated [HashiCorp Packer](https://www.packer.io) template for Raspberry Pi images, built around the [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm) ARM Packer builder plugin. It implements [`cloud-init`](https://cloudinit.readthedocs.io/en/latest/index.html) for last-mile OS configuration and management.
 *
 * See [`pi.pkr.hcl`](pi.pkr.hcl).
 *

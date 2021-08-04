@@ -16,7 +16,7 @@
 * 
 * ### 2. Build
 *
-* (e.g. using the [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb_gadget.pkrvars.hcl) [variable override file](https://www.packer.io/docs/templates/hcl_templates/variables#variable-definitions-pkrvars-hcl-and-auto-pkrvars-hcl-files) for the inputs below)
+* (e.g. using [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb_gadget.pkrvars.hcl)
 * ```bash
 * docker run --rm --privileged \
 *     -v /dev:/dev \

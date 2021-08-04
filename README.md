@@ -15,7 +15,7 @@ Copy [`example.pkrvars.hcl`](example.pkrvars.hcl) and edit.
 
 ### 2. Build
 
-(e.g. using [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb\_gadget.pkrvars.hcl)
+(e.g. using [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb\_gadget.pkrvars.hcl))
 ```bash
 docker run --rm --privileged \
     -v /dev:/dev \

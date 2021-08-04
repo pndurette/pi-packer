@@ -16,7 +16,7 @@
 * 
 * ### 2. Build
 *
-* (e.g. using [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb_gadget.pkrvars.hcl)
+* (e.g. using [`usb-gadget/usb_gadget.pkrvars.hcl`](usb-gadget/usb_gadget.pkrvars.hcl))
 * ```bash
 * docker run --rm --privileged \
 *     -v /dev:/dev \

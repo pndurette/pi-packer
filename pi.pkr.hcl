@@ -12,7 +12,7 @@
 *
 * Copy [`example.pkrvars.hcl`](example.pkrvars.hcl) and edit.
 * 
-* *(See [Packer docs](https://www.packer.io/docs/templates/hcl_templates/variables#assigning-values-to-build-variables) for more ways to set input variables)*.
+* *(See [Packer docs](https://www.packer.io/docs/templates/hcl_templates/variables#assigning-values-to-build-variables) for more ways to set input variables)*
 * 
 * ### 2. Build
 *

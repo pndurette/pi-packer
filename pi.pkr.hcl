@@ -51,6 +51,17 @@ variable "file_target_extension" {
     default = "zip"
 }
 
+variable "file_checksum" {
+    type = string
+    description = <<-EOT
+        The checksum value of `file_url`.
+
+        See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
+    EOT
+    default = ""
+}
+
+
 variable "file_checksum_url" {
     type = string
     description = <<-EOT
@@ -58,6 +69,7 @@ variable "file_checksum_url" {
         
         See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file).
     EOT
+    default = ""
 }
 
 variable "file_checksum_type" {
@@ -148,7 +160,7 @@ variable "boot_cmdline" {
     default = [
         "console=serial0,115200",
         "console=tty1",
-        "root=PARTUUID=9730496b-02",
+        "root=/dev/mmcblk0p2", # multimedia (SD) card block 0 partition 2
         "rootfstype=ext4",
         "elevator=deadline",
         "fsck.repair=yes",
@@ -182,24 +194,26 @@ variable "boot_config" {
 }
 
 variable "boot_config_filters" {
-    type = map(list(string))
+    type = list(list(string))
     description = <<-EOT
         [`/boot/config.txt`](ttps://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md)
 
-        Raspberry Pi system *conditional filters* configuration, as a map.
+        Raspberry Pi system *conditional filters* configuration, as a list.
 
         e.g.:
         ```
-        boot_config_filters =
-            "[pi0]": [
+        boot_config_filters = [
+            [
+                "[pi0]",
                 "jhi=123",
                 "klm=456"
             ],
-            "[pi0w]": [
+            [
+                "[pi0w]",
                 "xzy",
                 "123"
             ],
-        }
+        ]
         ```
         Will end `/boot/config.txt` with:
         ```
@@ -211,12 +225,13 @@ variable "boot_config_filters" {
         123
         ```
     EOT
-    default = {
-        "[pi4]": [
+    default = [
+        [
+			"[pi4]",
             "dtoverlay=vc4-fkms-v3d",
             "max_framebuffers=2"
         ]
-    }
+	]
 }
 
 variable "cloudinit_metadata_file" {
@@ -253,31 +268,30 @@ locals {
 
     # /boot/config.txt
     boot_config = <<-EOF
-        # General config
-        %{ for config in var.boot_config ~}
-        ${~ config}
-        %{ endfor ~}
+# General config
+%{ for config in var.boot_config ~}
+${~ config}
+%{ endfor ~}
 
-        # Filtered config
-        %{ for filter_name, filter_values in var.boot_config_filters ~}
-        ${~ filter_name}
-        %{ for config in filter_values ~}
-        ${~ config}
-        %{ endfor ~}
-        %{ endfor ~}
-    EOF
+# Filtered config
+%{ for filter_block in var.boot_config_filters ~}
+%{ for filter_element in filter_block ~}
+${~ filter_element }
+%{ endfor ~}
+%{ endfor ~}
+EOF
 
     # /etc/wpa_supplicant/wpa_supplicant.conf
     wpa_supplicant = <<-EOF
-        ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-        update_config=1
-        country=${upper(var.wpa_supplicant_country)}
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=${upper(var.wpa_supplicant_country)}
 
-        network={
-            ssid="${var.wpa_supplicant_ssid}"
-            psk="${var.wpa_supplicant_pass}"
-        }
-    EOF
+network={
+    ssid="${var.wpa_supplicant_ssid}"
+    psk="${var.wpa_supplicant_pass}"
+}
+EOF
 
     # /etc/locale.gen
     localgen = join("\n", var.locales)
@@ -293,6 +307,7 @@ source "arm" "rpi" {
     file_urls             = [var.file_url]
     file_target_extension = var.file_target_extension
 
+    file_checksum         = var.file_checksum
     file_checksum_url     = var.file_checksum_url
     file_checksum_type    = var.file_checksum_type
 
@@ -399,7 +414,7 @@ build {
     # TODO: Make multi-distro
     provisioner "shell" {
         inline = [
-            "sudo apt-get update",
+            "sudo apt-get update --allow-releaseinfo-change",
             "sudo apt-get install -y cloud-init"
         ]
     }
@@ -461,7 +476,7 @@ docker run --rm --privileged \
     -v ${PWD}:/build \
     mkaczanowski/packer-builder-arm \
         build \
-        -var-file=base.pkrvars.hcl \
-        -var-file=usb_gadget.pkrvars.hcl \
+        -var-file=octopi/octopi.pkvars.hcl \
+        -var-file=wifi.pkvars.hcl \
         pi.pkr.hcl
 */

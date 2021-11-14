@@ -46,12 +46,13 @@ boot_config = []
 # /boot/config.txt (conditional filters properties) (default)
 # https://www.raspberrypi.org/documentation/configuration/config-txt/conditional.md
 
-boot_config_filters = {
-    "[pi4]": [
+boot_config_filters = [
+    [
+        "[pi4]",
         "dtoverlay=vc4-fkms-v3d",
         "max_framebuffers=2"
     ]
-}
+]
 
 # Kernel modules to load at boot time
 

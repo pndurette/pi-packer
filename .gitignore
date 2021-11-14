@@ -1,3 +1,4 @@
+wifi.pkvars.hcl
 packer_cache/
 build/
 *.log

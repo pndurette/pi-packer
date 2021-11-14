@@ -28,12 +28,13 @@ boot_cmdline = [
     "modules-load=dwc2"
 ]
 
-boot_config_filters = {
-    "[pi4]": [
+boot_config_filters = [
+    [
+        "[pi4]".
         "dtoverlay=vc4-fkms-v3d",
         "max_framebuffers=2"
     ]
-}
+]
 
 kernel_modules = [
     "libcomposite"

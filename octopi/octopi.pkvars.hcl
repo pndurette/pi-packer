@@ -12,8 +12,17 @@ cloudinit_userdata_file = "octopi/octopi.userdata.yaml"
 boot_config_filters = [
     [
         "[all]",
+
         # Enable raspicam
-        "start_x=1",
-        "gpu_mem=128"
+        # "start_x=1",
+        # "gpu_mem=128",
+
+        # Disable bluetooth
+        "dtoverlay=disable-bt"
+
+        # Disable HDMI
+        # https://github.com/raspberrypi/firmware/issues/352#issuecomment-169455388
+        # Renable with vcgencmd display_power 1
+        "hdmi_blanking=2"
     ]
 ]

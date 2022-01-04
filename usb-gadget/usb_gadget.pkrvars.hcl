@@ -30,7 +30,7 @@ boot_cmdline = [
 
 boot_config_filters = [
     [
-        "[pi4]".
+        "[pi4]",
         "dtoverlay=vc4-fkms-v3d",
         "max_framebuffers=2"
     ]

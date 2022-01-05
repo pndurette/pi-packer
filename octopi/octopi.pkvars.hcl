@@ -18,7 +18,7 @@ boot_config_filters = [
         # "gpu_mem=128",
 
         # Disable bluetooth
-        "dtoverlay=disable-bt"
+        "dtoverlay=disable-bt",
 
         # Disable HDMI
         # https://github.com/raspberrypi/firmware/issues/352#issuecomment-169455388

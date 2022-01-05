@@ -24,6 +24,8 @@
 *     mkaczanowski/packer-builder-arm \
 *         build \
 *         -var-file=usb-gadget/usb_gadget.pkrvars.hcl \
+*         -var "git_repo=$(git remote get-url origin)" \
+*         -var "git_commit=$(git rev-parse HEAD)" \
 *         pi.pkr.hcl
 * ```
 * *(Using the above Docker image and run command is the easiest way to build cross-platform ARM images. See [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm#quick-start) for alternative ways to run Packer with the `packer-builder-arm` plugin)*
@@ -258,6 +260,26 @@ variable "kernel_modules" {
     default = []
 }
 
+variable "git_repo" {
+    type = string
+    description = <<-EOT
+        The current git remote to pass to the build. It will be prepended to `/boot/config.txt`
+
+        Use on the command-line, i.e. `-var "git_repo=$(git remote get-url origin)" `
+    EOT
+    default = ""
+}
+
+variable "git_commit" {
+    type = string
+    description = <<-EOT
+        The current git commit to pass to the build. It will be prepended to `/boot/config.txt`
+
+        Use on the command-line, i.e. `-var "git_commit=$(git rev-parse HEAD)"`
+    EOT
+    default = ""
+}
+
 # File content is all generated within locals
 
 locals {
@@ -359,6 +381,9 @@ build {
         inline = [
         <<-EOF
 			tee /boot/config.txt <<- CONFIG
+				# Image: ${var.image_path} (generated $(date))
+				# ${var.git_repo} (${var.git_commit})
+
 				${local.boot_config}
 				CONFIG
         EOF
@@ -410,7 +435,7 @@ build {
         ]
     }
 
-    # # Install cloud-init
+    # Install cloud-init
     # TODO: Make multi-distro
     provisioner "shell" {
         inline = [
@@ -478,5 +503,7 @@ docker run --rm --privileged \
         build \
         -var-file=octopi/octopi.pkvars.hcl \
         -var-file=wifi.pkvars.hcl \
+        -var "git_repo=$(git remote get-url origin)" \
+        -var "git_commit=$(git rev-parse HEAD)" \
         pi.pkr.hcl
 */

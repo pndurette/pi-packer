@@ -23,6 +23,8 @@ docker run --rm --privileged \
     mkaczanowski/packer-builder-arm \
         build \
         -var-file=usb-gadget/usb_gadget.pkrvars.hcl \
+        -var "git_repo=$(git remote get-url origin)" \
+        -var "git_commit=$(git rev-parse HEAD)" \
         pi.pkr.hcl
 ```
 *(Using the above Docker image and run command is the easiest way to build cross-platform ARM images. See [`packer-builder-arm`](https://github.com/mkaczanowski/packer-builder-arm#quick-start) for alternative ways to run Packer with the `packer-builder-arm` plugin)*
@@ -41,6 +43,8 @@ docker run --rm --privileged \
 | <a name="input_file_checksum_url"></a> [file\_checksum\_url](#input\_file\_checksum\_url) | The checksum file URL of `file_url`.<br>    <br>See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file). | `string` | `""` | no |
 | <a name="input_file_target_extension"></a> [file\_target\_extension](#input\_file\_target\_extension) | The file extension of `file_url`.<br>    <br>See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file). | `string` | `"zip"` | no |
 | <a name="input_file_url"></a> [file\_url](#input\_file\_url) | The URL of the OS image file.<br>    <br>See [packer-builder-arm](https://github.com/mkaczanowski/packer-builder-arm#remote-file). | `string` | n/a | yes |
+| <a name="input_git_commit"></a> [git\_commit](#input\_git\_commit) | The current git commit to pass to the build. It will be prepended to `/boot/config.txt`<br><br>Use on the command-line, i.e. `-var "git_commit=$(git rev-parse HEAD)"` | `string` | `""` | no |
+| <a name="input_git_repo"></a> [git\_repo](#input\_git\_repo) | The current git remote to pass to the build. It will be prepended to `/boot/config.txt`<br><br>Use on the command-line, i.e. `-var "git_repo=$(git remote get-url origin)" ` | `string` | `""` | no |
 | <a name="input_image_path"></a> [image\_path](#input\_image\_path) | The file path the new OS image to create. | `string` | n/a | yes |
 | <a name="input_kernel_modules"></a> [kernel\_modules](#input\_kernel\_modules) | List of Linux kernel modules to enable, as seen in `/etc/modules` | `list(string)` | `[]` | no |
 | <a name="input_locales"></a> [locales](#input\_locales) | List of locales to generate, as seen in `/etc/locale.gen`. | `list(string)` | <pre>[<br>  "en_CA.UTF-8 UTF-8",<br>  "en_US.UTF-8 UTF-8"<br>]</pre> | no |

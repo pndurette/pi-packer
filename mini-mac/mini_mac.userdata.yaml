@@ -1,0 +1,25 @@
+#cloud-config
+timezone: America/Toronto
+locale: en_CA.UTF-8
+
+ntp:
+  enabled: true
+
+users:
+  - default
+
+apt:
+  # keep existing sources (cloud-init wipes them by default)
+  preserve_sources_list: true
+
+# add each entry to ~/.ssh/authorized_keys for the configured user or the
+# first user defined in the user definition directive.
+ssh_authorized_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBR8dtNrWnTjdnorG28jfhd3xd4RuN5TzWGoTX+cS/oN pndurette@gmail.com
+
+# package_upgrade: true
+packages:
+  - htop
+  - vim
+  - xinput_calibrator
+  - matchbox-keyboard

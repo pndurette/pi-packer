@@ -1,0 +1,90 @@
+#cloud-config
+timezone: America/Toronto
+locale: en_CA.UTF-8
+
+# NB: mdns on the image is rascsi.local
+# NB: password for AppleShare must be 8 chars max (longer than the default)
+
+ntp:
+  enabled: true
+
+users:
+  - default
+
+apt:
+  # keep existing sources (cloud-init wipes them by default)
+  preserve_sources_list: true
+
+# add each entry to ~/.ssh/authorized_keys for the configured user or the
+# first user defined in the user definition directive.
+ssh_authorized_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBR8dtNrWnTjdnorG28jfhd3xd4RuN5TzWGoTX+cS/oN pndurette@gmail.com
+
+# package_upgrade: true
+packages:
+  - htop
+  - vim
+  # AFP File Sharing (w/ Netatalk 2.x fork from rdmark)
+  # https://github.com/akuker/RASCSI/wiki/AFP-File-Sharing
+  - libssl-dev
+  - libdb-dev
+  - libcups2-dev
+  - libavahi-client-dev
+  - libgcrypt20-dev
+  - autotools-dev
+  - automake
+  - libtool
+
+# AFP File Sharing (w/ Netatalk 2.x fork from rdmark)
+# https://github.com/akuker/RASCSI/wiki/AFP-File-Sharing
+
+write_files:
+  - path: /etc/netatalk/AppleVolumes.default
+    content: |
+      # Netatalk 2.x afp volume cofiguration
+      :DEFAULT: options:upriv,usedots
+      /home/pi/afpshare "Pi File Server" adouble:v1 volcharset:ASCII
+
+  - path: /etc/netatalk/afpd.conf
+    content: |
+      # CONFIGURATION FOR AFPD (Netatalk 2.x)
+      - -transall -uamlist uams_guest.so,uams_clrtxt.so,uams_dhx2.so -nosavepassword -noicon
+
+  - path: /etc/netatalk/atalkd.conf
+    content: |
+      wlan0 # AppleTalk/DDP protocol is know to work poorly over WifI
+      # eth0
+      # eth0 -phase 2 -net 0-65534 -addr 65280.163
+      # rascsi_bridge # if running the DaynaPORT, see docs.
+
+  # - path: /etc/modules
+  #   append: true
+  #   content: |
+  #     appletalk
+
+runcmd:
+  # Download, compile and install
+  - |
+    mkdir -p /run/netatalk \
+    & cd /run/netatalk \
+    & $ git clone https://github.com/rdmark/Netatalk-2.x.git  \
+    & cd Netatalk-2.x \
+    & ./bootstrap \
+    & ./configure --enable-systemd --enable-ddp \
+                  --enable-a2boot --enable-cups \
+                  --enable-timelord --enable-zeroconf \
+                  --sysconfdir=/etc --with-uams-path=/usr/lib/netatalk \
+    & make all \
+    & make install \
+    & rm -rf /run/netatalk
+
+  # AFP share directory
+  - mkdir /home/pi/afpshare
+  - chown pi:pi /home/pi/afpshare
+  - chmod 2775 /home/pi/afpshare
+
+  # Start services
+  - systemctl start atalkd
+  # - systemctl start papd
+  # - systemctl start timelord
+  # - systemctl start a2boot
